@@ -1,0 +1,56 @@
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+builds:
+  - id: kubectl-plugin_completion
+    binary: kubectl-plugin_completion
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+    - goos: windows
+      goarch: arm64
+archives:
+  - builds:
+    - kubectl-plugin_completion
+    name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    wrap_in_directory: false
+    format: tar.gz
+    files:
+    - LICENSE
+    format_overrides:
+      - goos: windows
+        format: zip
+    id: kubectl-plugin_completion
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Version }}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+krews:
+  -
+    name: plugin_completion
+    ids:
+    - kubectl-plugin_completion
+    homepage: "https://github.com/MartinSimango/kubectl-plugin_completion"
+    description: "This plugin allows for the creation of completion scripts"
+    short_description: "Allow shell completion for kubectl plugins"
+
+    url_template: "https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    skip_upload: true
+
+release:
+  extra_files:
+    - glob: ./dist/plugin_completion.yaml

@@ -1,0 +1,4 @@
+releases/
+dist/
+.token
+.DS_STORE

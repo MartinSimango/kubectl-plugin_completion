@@ -1,0 +1,45 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: plugin_completion
+spec:
+  version: v0.1.4
+  platforms:
+    - bin: kubectl-plugin_completion.exe
+      uri: https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.4/kubectl-plugin_completion_v0.1.4_windows_amd64.zip
+      sha256: 37a9aa73a90c200f31384e1d814d8e1495a2d91562f50c488ca4bb1f04a42c0c
+      selector:
+        matchLabels:
+          os: windows
+          arch: amd64
+    - bin: kubectl-plugin_completion
+      uri: https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.4/kubectl-plugin_completion_v0.1.4_linux_arm64.tar.gz
+      sha256: e34a88f83f52af69b89c6754d069e69a3bdce15583f28ae543ed86b3727a5f9e
+      selector:
+        matchLabels:
+          os: linux
+          arch: arm64
+    - bin: kubectl-plugin_completion
+      uri: https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.4/kubectl-plugin_completion_v0.1.4_linux_amd64.tar.gz
+      sha256: af1fbcc61dcfcc1a855bc3243769b5edb44378c5346c87400cbf071c14d46d6a
+      selector:
+        matchLabels:
+          os: linux
+          arch: amd64
+    - bin: kubectl-plugin_completion
+      uri: https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.4/kubectl-plugin_completion_v0.1.4_darwin_arm64.tar.gz
+      sha256: d2412893dad378cba77157e57f0750f45204d8f5427545486fd4e92adc884dce
+      selector:
+        matchLabels:
+          os: darwin
+          arch: arm64
+    - bin: kubectl-plugin_completion
+      uri: https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.4/kubectl-plugin_completion_v0.1.4_darwin_amd64.tar.gz
+      sha256: 8e842044743c3faa650e8a51389611cb51fe4655aa1af73946efc67bd2556ba4
+      selector:
+        matchLabels:
+          os: darwin
+          arch: amd64
+  shortDescription: Allow shell completion for kubectl plugins
+  homepage: https://github.com/MartinSimango/kubectl-plugin_completion
+  description: This plugin allows for the creation of completion scripts
