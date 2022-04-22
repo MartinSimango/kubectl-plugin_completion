@@ -18,7 +18,7 @@ Plugin can be installed in 3 ways:
  ```sh 
 $ kubectl krew install --manifest-url https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.0/plugin_completion.yaml
 ``` 
-2. Zip file containing binary can be download on the [release page](https://github.com/MartinSimango/kubectl-plugin-autocompletion/releases)
+2. Zip file containing binary can be downloaded on the [release page](https://github.com/MartinSimango/kubectl-plugin-autocompletion/releases)
 
 3. Manually by cloning the repo and running make install - (This requires you having go installed)
 
