@@ -16,11 +16,11 @@ var configGenerateCmd = &cobra.Command{
 	Short: "Generate plugin files for shell scripts",
 	Long:  `Generate plugin files for shell scripts`,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		NewBashPluginConfigImpl().GeneratePluginConfig()
 		NewZshPluginConfigImpl().GeneratePluginConfig()
 
-		fmt.Println("Run source <(kubectl plugin_completion generate $SHELL) to update completion")
+		fmt.Println("Run source <(kubectl plugin_completion plugin_completion $SHELL_NAME) to update kubectl plugin completion")
+
 	},
 }
 

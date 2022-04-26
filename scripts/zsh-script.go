@@ -8,7 +8,8 @@ declare -A cobraSupported
 
 init_plugins(){
 
-	source <(kubectl completion zsh)	
+	source <(kubectl completion zsh)
+    	
 %s
 }
 

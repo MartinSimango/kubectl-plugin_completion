@@ -4,7 +4,9 @@ var BashCompletionScript = `
 declare -A pluginCompletionFunction
 
 init_plugins(){
+
     source <(kubectl completion bash)
+        
 %s    
 }
 

@@ -5,6 +5,11 @@ endif
 install:
 	go build && go install
 
+uninstall:
+	-rm ${GOBIN}/kubectl-plugin_completion
+
+reinstall: uninstall install
+
 release:
 	goreleaser release --rm-dist
 
