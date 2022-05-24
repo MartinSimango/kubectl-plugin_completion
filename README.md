@@ -1,5 +1,12 @@
 # kubectl-plugin_completion
 
+> :warning: **Notice**
+> * This has been tested on for kubectl v1.23 and has not been tested on the kubectl v1.24.
+> * Not all kubectl plugins have been tested. You can find a listed of tested plugins at [here]() (link not yet completed). Please not if a plugin hasn't been tested
+> it might cause unwanted errors such as your shell hanging.
+> * Plugin only supports zsh and bash shells (for now).
+
+
 Auto completion saves a lot of time when typing in commands. The kubectl tool has a way to allow for completion for it's sub-commands,
 however it doesn't not accomodate for when these sub-commands are plugin commands. This repo contains the code for a kubectl plugin that generates scripts for extending the kubectl tool in order to accomodate for completions for kubectl plugin sub-commands.
 
