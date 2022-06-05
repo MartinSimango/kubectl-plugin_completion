@@ -23,7 +23,7 @@ Plugin can be installed in 3 ways:
 
 1. Via krew
  ```sh 
-$ kubectl krew install --manifest-url https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.1/plugin_completion.yaml
+$ kubectl krew install --manifest-url https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.2/plugin_completion.yaml
 ``` 
 2. Zip file containing binary can be downloaded on the [release page](https://github.com/MartinSimango/kubectl-plugin-autocompletion/releases)
 
