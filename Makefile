@@ -16,4 +16,3 @@ release:
 release-local:
 	goreleaser release --snapshot --rm-dist
 
-# export BASH_COMP_DEBUG_FILE=$(pwd)/p.sh
