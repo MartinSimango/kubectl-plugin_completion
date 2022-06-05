@@ -29,6 +29,8 @@ var editBashCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		fmt.Println("bash config file edited")
+		fmt.Println("Please run 'source <(kubectl plugin_completion plugin-completion bash)' to ensure your changes take effect immediately.")
+
 	},
 }
 

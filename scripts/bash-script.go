@@ -49,10 +49,18 @@ __start_kubectl()
     if [[ "$COMP_CWORD" == "1" ]]; then
         COMPREPLY+=( $(compgen -W "%s" -- ${COMP_WORDS[1]}) )
     fi
-    
+
     if [[ "$COMP_CWORD" > "1" ]]; then
         __is_kubectl_plugin_command ${COMP_WORDS[1]}
         if [[ "$?" == "0" ]]; then 
+            __does_kubectl_plugin_override_kubectl ${COMP_WORDS[1]}
+            if [[  "$?" == "0" ]]; then 
+                del_element=1; 
+                words=( "${words[@]:0:$((del_element))}" "${words[@]:$((del_element+1))}" )
+                cword=$((cword-1))
+                __kubectl_handle_word
+                return
+            fi
             local plugin
             plugin=${COMP_WORDS[1]}
             if [[ ! -z ${pluginCompletionFunction[$plugin]} ]]; then # make sure description function was specified
@@ -88,4 +96,20 @@ __is_kubectl_plugin_command() {
         done
       return 1
 }
+
+__does_kubectl_plugin_override_kubectl() {
+
+    local kubectl_override_plugins=(%s)
+
+    current_word=$1
+    local plugin
+    for plugin in "${kubectl_override_plugins[@]}"
+        do
+            if [[ "$current_word" == "$plugin" ]]; then
+                return 0
+            fi
+        done
+      return 1
+}
+
 `

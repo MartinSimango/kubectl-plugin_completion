@@ -1,0 +1,22 @@
+Plugins with * next to them have completion supported
+
+1. access-matrix                  
+2. accurate *                   
+3. allctx                       
+4. assert                        
+5. auth-proxy                     
+6. aws-auth                        
+7. azad-proxy                     
+8. blame                           
+9. bulk-action                     
+10. ca-cert                         
+11. capture                         
+12. cert-manager                    
+13. cluster-group                   
+14. clusternet         
+15. krew *
+16. tree  
+17. stern *
+18. vpa_recommendation       
+19. who-can 
+20. whoami 

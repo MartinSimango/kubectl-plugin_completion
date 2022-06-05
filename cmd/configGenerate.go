@@ -19,7 +19,7 @@ var configGenerateCmd = &cobra.Command{
 		NewBashPluginConfigImpl().GeneratePluginConfig()
 		NewZshPluginConfigImpl().GeneratePluginConfig()
 
-		fmt.Println("Run source <(kubectl plugin_completion plugin_completion $SHELL_NAME) to update kubectl plugin completion")
+		fmt.Println("Run source <(kubectl plugin_completion plugin-completion $SHELL_NAME) to update kubectl plugin completion")
 
 	},
 }

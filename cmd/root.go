@@ -14,8 +14,8 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "plugin_completion",
-	Short: "A kubectl plugin for allowing completions for kubectl plugins",
-	Long: `A kubectl plugin for allowing completions for kubectl plugins
+	Short: "A kubectl plugin for allowing shell completions for kubectl plugins",
+	Long: `A kubectl plugin for allowing shell completions for kubectl plugins
 
 	Find more information at: https://github.com/MartinSimango/kubectl-plugin-autocompletion
 	`,

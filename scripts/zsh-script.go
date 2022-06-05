@@ -47,20 +47,27 @@ _kubectl()
     # edit words array to allow plugin autocompletion
 	if [[ ${CURRENT} > 2 ]]; then
 		for plugin in "${kubectlPlugins[@]}"
-		do
+		do  
+          
 			if [[ ${words[2]} == "$plugin" ]]; then
-				if [[ ! -z "$_comps[kubectl-$plugin]" ]]; then  # make sure plugin has completion function
-					words[1]="kubectl-$plugin"
+                __does_kubectl_plugin_override_kubectl $plugin
+                if [[  "$?" == "0" ]]; then 
 					del_element=2; 
 					words=( "${words[@]:0:$((del_element-1))}" "${words[@]:$del_element}" )
-					if [[ -z ${cobraSupported[$plugin]} ]]; then 
-						((CURRENT--))
-						$_comps[kubectl-$plugin] # call the completion function for the plugin
-						return
-					fi
-				else
-					return
-				fi
+                    $_comps[kubectl]
+                    return
+                fi
+				if [[ ! -z "$_comps[kubectl-$plugin]" ]]; then  # make sure plugin has completion function
+					del_element=2; 
+					words=( "${words[@]:0:$((del_element-1))}" "${words[@]:$del_element}" )
+                    ((CURRENT--))
+                    words[1]="kubectl-$plugin"
+                    $_comps[kubectl-$plugin] # call the completion function for the plugin
+                    
+                    return
+                else
+                    return
+                fi
 			fi
     	done
 	fi
@@ -212,4 +219,21 @@ _kubectl()
             fi
         fi
     fi
-}`
+}
+
+__does_kubectl_plugin_override_kubectl() {
+
+    local kubectl_override_plugins=(%s)
+
+    current_word=$1
+    local plugin
+    for plugin in "${kubectl_override_plugins[@]}"
+        do
+            if [[ "$current_word" == "$plugin" ]]; then
+                return 0
+            fi
+        done
+      return 1
+}
+
+`

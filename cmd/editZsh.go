@@ -19,10 +19,10 @@ var editZshCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		pluginName := cmd.Flag("plugin").Value.String()
 		description := cmd.Flag("description").Value.String()
-		completionFunctionName := cmd.Flag("completionFunction").Value.String()
+		completionFunctionName := cmd.Flag("completion-function").Value.String()
 
 		descriptionSet := cmd.Flag("description").Changed
-		completionFunctionSet := cmd.Flag("completionFunction").Changed
+		completionFunctionSet := cmd.Flag("completion-function").Changed
 
 		err := NewZshPluginConfigImpl().EditPlugin(pluginName, completionFunctionName, description, completionFunctionSet, descriptionSet)
 		if err != nil {
@@ -30,6 +30,7 @@ var editZshCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		fmt.Println("zsh config file edited")
+		fmt.Println("Please run 'source <(kubectl plugin_completion plugin-completion zsh)' to ensure your changes take effect immediately.")
 	},
 }
 

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/MartinSimango/kubectl-plugin_completion/scripts"
 	"gopkg.in/yaml.v2"
@@ -22,7 +23,9 @@ type Shells struct {
 
 var shells = map[string]string{"zsh": "zsh.yaml", "bash": "bash.yaml"}
 
-var cobraBlackList = []string{"cert_manager", "stern"}
+//  list will be populated if DoesPluginHaveCobraSupport function fails to work correctly for a particular
+//  plugin
+var cobraBlackList = []string{"view_secret", "auth_proxy", "blame"}
 
 type Plugin struct {
 	Name                          string `yaml:"name"`
@@ -32,30 +35,38 @@ type Plugin struct {
 }
 
 type PluginConfigImpl struct {
-	ConfigFile    string   `yaml:"configfile,omitempty"`
-	Shell         string   `yaml:"shell"`
-	ShellLocation string   `yaml:"shellLocation"`
-	Plugins       []Plugin `yaml:"plugins"`
+	ConfigFile             string   `yaml:"configfile,omitempty"`
+	Shell                  string   `yaml:"shell"`
+	ShellLocation          string   `yaml:"shellLocation"`
+	Plugins                []Plugin `yaml:"plugins"`
+	KubectlOverridePlugins []string `yaml:"kubectlOverridePlugins"`
 }
 
 type PluginConfig interface {
 	AddPlugin(plugin Plugin) error
 	DisplayConfig() error
 	DoesPluginExist(plugin string) bool
-	DoesPluginUseCobra(plugin string) bool
+	DoesPluginHaveCobraSupport(plugin string) bool
 	EditPlugin(pluginName string, completionFunctionName, description string, completionFunctionSet, descriptionSet bool) error
 	GetPlugin(pluginName string) (*Plugin, error)
+	PrintAllPlugins()
+	PrintCobraPlugins()
 
 	GeneratePluginConfig() error
 	GetCompletionFunctionName(plugin string) string
+	GetCompletionScriptSection(plugin string) string
 
 	GetConfig() *PluginConfigImpl
-	WriteCleanConfig() error
 	GenerateCompletionScript() (string, error)
+	WriteCleanConfig() error
 
 	checkConfigFile() error
-
 	createConfigFolder() error
+
+	doesPluginUseCobra(plugin string) bool
+	doesPluginHaveCobraCompletionCommand(plugin string) bool
+	doesPluginCompletionOverrideKubectl(plugin string) bool
+
 	getAllKubectlPlugins() ([]string, error)
 
 	populatePlugins([]string) error
@@ -95,6 +106,9 @@ func (pc *PluginConfigImpl) AddPlugin(plugin Plugin) error {
 	}
 
 	pc.Plugins = append(pc.Plugins, plugin)
+	if pc.doesPluginCompletionOverrideKubectl(plugin.Name) {
+		pc.KubectlOverridePlugins = append(pc.KubectlOverridePlugins, plugin.Name)
+	}
 	return nil
 }
 
@@ -176,7 +190,7 @@ func (pc *PluginConfigImpl) populatePlugins(plugins []string) error {
 		err := pc.AddPlugin(Plugin{
 			Name:                          plugin,
 			CompletionFunctionName:        completionFunctionName,
-			Description:                   fmt.Sprintf("A kubectl plugin called %s", plugin),
+			Description:                   pc.getPluginDescription(plugin),
 			PluginSupportsCobraCompletion: completionFunctionName != "",
 		})
 
@@ -187,6 +201,34 @@ func (pc *PluginConfigImpl) populatePlugins(plugins []string) error {
 
 	pc.removeOldPlugins(plugins)
 	return nil
+}
+
+func (pc *PluginConfigImpl) getPluginDescription(plugin string) string {
+	switch plugin {
+	case "krew":
+		return "krew is the kubectl plugin manager"
+	case "plugin_completion":
+		return "A kubectl plugin for allowing shell completions for kubectl plugins"
+	case "stern":
+		return "Multi pod and container log tailing"
+	}
+	command := "kubectl krew search " + strings.ReplaceAll(plugin, "_", "-") + " | head -n 2 | awk -F '  ' 'NR>1 {print $2}'" //awk '/DESCRIPTION:/,NF==0' | sed -n '1!p'"
+
+	// command := "kubectl krew info " + strings.ReplaceAll(plugin, "_", "-") + " | awk '/DESCRIPTION:/,NF==0' | sed -n '1!p'"
+	output, err := exec.Command(pc.ShellLocation, "-c", command).Output()
+	outputString := string(output[:])
+	if err != nil {
+		fmt.Println(command)
+		log.Fatal(string(outputString))
+	}
+
+	if strings.TrimSpace(outputString) == "" || strings.HasPrefix(outputString, "error:") {
+		return fmt.Sprintf("A kubectl plugin called %s", plugin)
+	}
+	a := strings.ReplaceAll(outputString, "\n", " ")
+	fmt.Println(a)
+
+	return a
 }
 
 func (pc *PluginConfigImpl) removeOldPlugins(currentPlugins []string) {
@@ -290,37 +332,74 @@ func (pc *PluginConfigImpl) DoesPluginExist(plugin string) bool {
 }
 
 func (pc *PluginConfigImpl) GetCompletionFunctionName(plugin string) string {
-	if !pc.DoesPluginUseCobra(plugin) {
+	if !pc.DoesPluginHaveCobraSupport(plugin) {
 		return ""
 	}
 
+	switch plugin {
+	case "support_bundle":
+		plugin = "support-bundle"
+	}
 	switch pc.Shell {
 	case "zsh":
 		return "_" + plugin
 	case "bash":
 		return "__start_" + plugin
 	}
-	return "unsupported"
+	return "unsupported shell"
 }
 
-func (pc *PluginConfigImpl) DoesPluginUseCobra(plugin string) bool {
-	if inCobraBlackList(plugin) {
+func (pc *PluginConfigImpl) DoesPluginHaveCobraSupport(plugin string) bool {
+	if isInList(cobraBlackList, plugin) {
 		return false
 	}
-	command := "grep ValidArgsFunction $(which kubectl-" + plugin + ") || true"
-	output, err := exec.Command(pc.ShellLocation, "-c", command).Output()
+	return pc.doesPluginUseCobra(plugin) && pc.doesPluginHaveCobraCompletionCommand(plugin)
 
+}
+
+func (pc *PluginConfigImpl) doesPluginUseCobra(plugin string) bool {
+	// command := "grep ValidArgsFunction $(which kubectl-" + plugin + ") || true"
+
+	// output, err := exec.Command(pc.ShellLocation, "-c", command).Output()
+	// outputString := string(output[:])
+	// if err != nil {
+	// 	fmt.Println(command)
+	// 	log.Fatal(string(outputString))
+	// }
+
+	// if strings.TrimSpace(outputString) == "" {
+	// 	return false
+	// } else {
+	// 	return true
+	// }
+	return true
+
+}
+
+func (pc *PluginConfigImpl) doesPluginHaveCobraCompletionCommand(plugin string) bool {
+	command := "strings $(which kubectl-" + plugin + ")" +
+		` | grep "Generate the autocompletion script for powershell.
+Generate the autocompletion script for the fish shell.
+Generate the autocompletion script for the zsh shell.
+Generate the autocompletion script for the bash shell." | cut -d$'\n' -f1
+`
+
+	output, err := exec.Command(pc.ShellLocation, "-c", command).Output()
+	outputString := string(output[:])
 	if err != nil {
 		fmt.Println(command)
-		log.Fatal(string(output[:]))
+		log.Fatal(string(outputString))
 	}
 
-	if strings.TrimSpace(string(output[:])) == "" {
+	// if the output from the command starts with this string then shell completion
+	// is mostly likely not guarenteed
+	noCompletionPrefix := "Examples: `/foo` would allow `/foo`"
+
+	if strings.TrimSpace(outputString) == "" || strings.HasPrefix(outputString, noCompletionPrefix) {
 		return false
 	} else {
 		return true
 	}
-
 }
 
 func (pc *PluginConfigImpl) GenerateCompletionScript() (string, error) {
@@ -339,11 +418,11 @@ func (pc *PluginConfigImpl) GenerateCompletionScript() (string, error) {
 
 		// source section
 		if pluginUsesCobra {
-			initPluginCode += fmt.Sprintf("\tsource <(kubectl-%s completion %s)\n", plugin.Name, pc.Shell)
-
+			initPluginCode += pc.GetConfig().GetCompletionScriptSection(plugin.Name)
 		}
 
 		//completion function section
+
 		if plugin.CompletionFunctionName != "" {
 			switch pc.Shell {
 			case "bash":
@@ -373,19 +452,72 @@ func (pc *PluginConfigImpl) GenerateCompletionScript() (string, error) {
 
 	switch pc.Shell {
 	case "bash":
-		return fmt.Sprintf(scripts.BashCompletionScript, initPluginCode, plugins, plugins), nil
+		return fmt.Sprintf(scripts.BashCompletionScript, initPluginCode, plugins, plugins, strings.Join(pc.KubectlOverridePlugins, " ")), nil
 	case "zsh":
-		return fmt.Sprintf(scripts.ZshCompletionScript, plugins, initPluginCode), nil
+		return fmt.Sprintf(scripts.ZshCompletionScript, plugins, initPluginCode, strings.Join(pc.KubectlOverridePlugins, " ")), nil
 	}
 	return "", nil
 }
 
-func inCobraBlackList(plugin string) bool {
-	for _, pluginName := range cobraBlackList {
-		if plugin == pluginName {
+func (pc PluginConfigImpl) GetCompletionScriptSection(plugin string) string {
+	switch plugin {
+	case "stern":
+		return fmt.Sprintf("\tsource <(kubectl-%s --completion %s)\n", plugin, pc.Shell)
+	}
+
+	return fmt.Sprintf("\tsource <(kubectl-%s completion %s)\n", plugin, pc.Shell)
+
+}
+
+func isInList(list []string, searchString string) bool {
+	for _, item := range list {
+		if item == searchString {
 			return true
 		}
 	}
 	return false
+}
 
+func (pc PluginConfigImpl) PrintCobraPlugins() {
+	var count = 1
+	for _, plugin := range pc.Plugins {
+		if plugin.PluginSupportsCobraCompletion {
+			fmt.Printf("%d\t%s\n", count, plugin.Name)
+			count++
+		}
+	}
+}
+
+func (pc PluginConfigImpl) PrintAllPlugins() {
+
+	w := new(tabwriter.Writer)
+
+	w.Init(os.Stdout, 8, 8, 0, '\t', tabwriter.AlignRight)
+
+	defer w.Flush()
+
+	fmt.Fprintf(w, "\n%s\t%s\t%s\t", "NAME", "DESCRIPTION", "COMPLETION SUPPORTED")
+
+	for _, plugin := range pc.Plugins {
+		supported := "yes"
+		if !plugin.PluginSupportsCobraCompletion {
+			supported = "no"
+		}
+
+		maxLength := 100
+		if len(plugin.Description) > maxLength {
+			plugin.Description = plugin.Description[0:maxLength] + "..."
+		}
+		fmt.Fprintf(w, "\n%s\t%s\t%s", plugin.Name, plugin.Description, supported)
+	}
+	fmt.Fprintf(w, "\n")
+
+}
+
+func (pc PluginConfigImpl) doesPluginCompletionOverrideKubectl(plugin string) bool {
+	switch plugin {
+	case "allctx":
+		return true
+	}
+	return false
 }
