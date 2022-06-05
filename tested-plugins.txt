@@ -2,7 +2,7 @@ Plugins with * next to them have completion supported
 
 1. access-matrix                  
 2. accurate *                   
-3. allctx                       
+3. allctx *                    
 4. assert                        
 5. auth-proxy                     
 6. aws-auth                        
