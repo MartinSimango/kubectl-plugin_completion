@@ -2,7 +2,7 @@
 
 > :warning: **Notice**
 > * This has been tested on for kubectl v1.23 and has not been tested on the kubectl v1.24.
-> * Not all kubectl plugins have been tested. You can find a listed of tested plugins at [here]() (link not yet completed). Please not if a plugin hasn't been tested
+> * Not all kubectl plugins have been tested. You can find a listed of tested plugins at [here](https://github.com/MartinSimango/kubectl-plugin_completion/blob/main/tested-plugins.txt). Please not if a plugin hasn't been tested
 > it might cause unwanted errors such as your shell hanging.
 > * Plugin only supports zsh and bash shells (for now).
 
