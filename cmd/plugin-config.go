@@ -225,10 +225,9 @@ func (pc *PluginConfigImpl) getPluginDescription(plugin string) string {
 	if strings.TrimSpace(outputString) == "" || strings.HasPrefix(outputString, "error:") {
 		return fmt.Sprintf("A kubectl plugin called %s", plugin)
 	}
-	a := strings.ReplaceAll(outputString, "\n", " ")
-	fmt.Println(a)
+	description := strings.ReplaceAll(outputString, "\n", " ")
 
-	return a
+	return description
 }
 
 func (pc *PluginConfigImpl) removeOldPlugins(currentPlugins []string) {

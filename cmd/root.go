@@ -17,7 +17,7 @@ var rootCmd = &cobra.Command{
 	Short: "A kubectl plugin for allowing shell completions for kubectl plugins",
 	Long: `A kubectl plugin for allowing shell completions for kubectl plugins
 
-	Find more information at: https://github.com/MartinSimango/kubectl-plugin-autocompletion
+	Find more information at: https://github.com/MartinSimango/kubectl-plugin_completion
 	`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:

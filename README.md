@@ -25,7 +25,7 @@ Plugin can be installed in 3 ways:
  ```sh 
 $ kubectl krew install --manifest-url https://github.com/MartinSimango/kubectl-plugin_completion/releases/download/v0.1.2/plugin_completion.yaml
 ``` 
-2. Zip file containing binary can be downloaded on the [release page](https://github.com/MartinSimango/kubectl-plugin-autocompletion/releases)
+2. Zip file containing binary can be downloaded on the [release page](https://github.com/MartinSimango/kubectl-plugin_completion/releases)
 
 3. Manually by cloning the repo and running make install - (This requires you having go installed)
 
@@ -100,8 +100,7 @@ Once the above is done completions for your plugins should work as displayed in 
 
 ## Example
 <p align="center">
-<img src="https://github.com/MartinSimango/kubectl-plugin-autocompletion/blob/main/kub-plugin.gif" style="width:600px;height=1000px"/>
+<img src="https://github.com/MartinSimango/kubectl-plugin_completion/blob/main/kub-plugin.gif" style="width:600px;height=1000px"/>
 </p>
-<!-- ![Alt Text](https://github.com/MartinSimango/kubectl-plugin-autocompletion/blob/main/kub-plugin.gif) -->
 
 
