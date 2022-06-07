@@ -11,10 +11,10 @@ Auto completion saves a lot of time when typing in commands. The kubectl tool ha
 however it doesn't not accomodate for when these sub-commands are plugin commands. This repo contains the code for a kubectl plugin that generates scripts for extending the kubectl tool in order to accomodate for completions for kubectl plugin sub-commands.
 
 ## Sections
-* [Install plugin](https://github.com/MartinSimango/kubectl-plugin-autocompletion#install-plugin)
-* [How it works](https://github.com/MartinSimango/kubectl-plugin-autocompletion#how-it-works)
-* [How to use](https://github.com/MartinSimango/kubectl-plugin-autocompletion#how-to-use)
-* [Example](https://github.com/MartinSimango/kubectl-plugin-autocompletion#example)
+* [Install plugin](https://github.com/MartinSimango/kubectl-plugin_completion#install-plugin)
+* [How it works](https://github.com/MartinSimango/kubectl-plugin_completion#how-it-works)
+* [How to use](https://github.com/MartinSimango/kubectl-plugin_completion#how-to-use)
+* [Example](https://github.com/MartinSimango/kubectl-plugin_completion#example)
 
 
 ## Install plugin
